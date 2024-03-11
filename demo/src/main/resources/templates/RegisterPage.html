@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Online Customer Registration Form</title>
+    <style>
+        body {
+        color : #4a4e69;
+        }
+
+        #searchBox {
+        width : 230px;
+        }
+
+        #searchButton {
+        background-color: #4a4e69;
+        color : #ffffff;
+        }
+
+        .formContainer {
+        float: left;
+        background-color: white;
+        padding: 0px;
+        display: grid;
+        place-items: center;
+        width: 400px;
+        height: 650px;
+        }
+
+        .image {
+            float: left;
+            margin-left : 140px;
+        }
+
+        .customImage {
+            height: 650px;
+            width: 800px;
+            margin-top: 10px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .inputBox {
+            margin-bottom: 10px;
+            width: 300px;
+        }
+
+        #remarks {
+            height: 100px;
+        }
+
+        #submitButton{
+        background-color: #4a4e69;
+        color : #ffffff;
+        margin-left : 100px;
+        }
+
+        h4{
+        color : #4a4e69;
+        margin-bottom : 0px;
+        }
+
+    </style>
+
+    <script>
+
+
+        function sendApiRequest() {
+    try {
+        var form = document.getElementById("registrationForm");
+        var formData = new FormData(form);
+        var data = {};
+        formData.forEach(function(value, key) {
+            data[key] = value;
+        });
+        var json = JSON.stringify(data);
+
+        fetch("/registration", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: json
+        })
+        .then(function(response) {
+            return response.text();
+        })
+        .then(function(data) {
+            window.alert(data);
+        });
+        return false;
+    } catch (error) {
+        console.error(error);
+<!--        window.alert("Error: " + error.message);-->
+        window.console.log("error occurred while processing{}", error.message)
+    }
+}
+
+
+        function search(event) {
+    try {
+        event.preventDefault();
+        var searchValue = document.getElementById("searchBox").value;
+        fetch("/search", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ nicNumber: searchValue }),
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            window.alert("API Response: " + JSON.stringify(data));
+        });
+    } catch (error) {
+        console.error(error);
+        window.alert("Error: " + error.message);
+    }
+}
+
+
+
+
+
+    </script>
+
+</head>
+<body>
+
+<div class="image">
+    <img src="/image.jpg" alt="My Image" class="customImage">
+</div>
+
+<div class="formContainer">
+
+    <div >
+        <h4 >Search customers by NIC number : </h4>
+        <form id="searchForm"  th:action="@{/search}" method="post" onsubmit="search(event)">
+            <input type="text" id="searchBox" name="searchBox" placeholder="Please enter the NIC number" required>
+            <button id="searchButton" type="submit">Search</button>
+        </form>
+<!--        <hr style="display: inline;">-->
+    </div>
+
+    <h4>Online Customer Registration Form</h4>
+    <form class="form" id="registrationForm" th:action="@{/registration}" method="post"
+          onsubmit="return sendApiRequest()">
+
+        <label for="title">Title : </label><br>
+        <select class="inputBox" id="title" name="title" required>
+            <option value="Mr">Mr</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Miss">Miss</option>
+            <option value="Other">Other</option>
+        </select><br>
+
+        <label for="firstName">First Name : </label><br>
+        <input type="text" class="inputBox" id="firstName" name="firstName"
+               placeholder="Please enter the first name" required><br>
+
+        <label for="lastName">Last Name : </label><br>
+        <input type="text" class="inputBox" id="lastName" name="lastName" placeholder="Please enter the last name"
+               required><br>
+
+        <label for="age">Age : </label><br>
+        <input type="text" class="inputBox" id="age" name="age" placeholder="Please enter the age" pattern="[0-9]*"
+               title="Age must contain only numbers"
+               required><br>
+
+        <label for="annualIncome">Annual Income : </label><br>
+        <input type="text" class="inputBox" id="annualIncome" name="annualIncome"
+               placeholder="Please enter the annual income" pattern="[0-9]*"
+               title="Annual Income must contain only numbers"
+               required><br>
+
+        <label for="loginUsername">Login Username : </label><br>
+        <input type="text" class="inputBox" id="loginUsername" name="loginUsername"
+               placeholder="Please enter the login username" required><br>
+
+        <label for="password">Password : </label><br>
+        <input type="password" class="inputBox" id="password" name="password"
+               placeholder="Please enter the password"
+               pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\\-=\\[\]{};':\\|,.<>/?]).{8,}$"
+               title="Password must contain at least one uppercase letter, one lowercase letter, one digit, one special character, and be at least 8 characters long."
+               required><br>
+
+        <label for="nicNumber">NIC Number : </label><br>
+        <input type="text" class="inputBox" id="nicNumber" name="nicNumber"
+               placeholder="Please enter the NIC number" required><br>
+
+        <label for="remarks">Remarks : </label><br>
+        <input type="text" class="inputBox" id="remarks" name="remarks"
+               placeholder="Please enter remarks (optional)"><br>
+
+        <button id="submitButton">Click to register</button>
+    </Form>
+</div>
+</body>
+</html>
